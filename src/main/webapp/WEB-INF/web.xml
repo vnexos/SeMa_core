@@ -1,0 +1,14 @@
+<web-app>
+  <name>Self Management - SeMa</name>
+  <servlet>
+    <servlet-name>ApiController</servlet-name>
+    <servlet-class>com.vnexos.sema.ApiController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ApiController</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+  <listener>
+    <listener-class>com.vnexos.sema.AppInitializer</listener-class>
+  </listener>
+</web-app>
