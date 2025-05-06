@@ -65,7 +65,7 @@ public class ApiController extends HttpServlet {
    * @param queryString the query string
    * @param method      the HTTP method of route
    */
-  private static void logRoute(int port, String route, String queryString, String method) {
+  private static void logRoute(int port, String route, String queryString, String method, long time) {
     StringBuilder msg = new StringBuilder();
 
     // Add method and route with the white color
@@ -98,6 +98,10 @@ public class ApiController extends HttpServlet {
       msg.append(242);
     msg.append(')');
     msg.append(port);
+    msg.append("$fg(15) (");
+    msg.append("$fg(12)");
+    msg.append(System.currentTimeMillis() - time);
+    msg.append(" $fg(15)ms)");
 
     // Format the message of route.
     Formatter formatter = new Formatter();
@@ -247,6 +251,7 @@ public class ApiController extends HttpServlet {
    */
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    long time = System.currentTimeMillis();
     boolean isOriginFailed = !handleCors(req, resp);
 
     String path = req.getRequestURI();
@@ -291,6 +296,6 @@ public class ApiController extends HttpServlet {
       Constants.context.log(e);
     }
 
-    logRoute(resp.getStatus(), path, req.getQueryString(), method);
+    logRoute(resp.getStatus(), path, req.getQueryString(), method, time);
   }
 }

@@ -132,7 +132,7 @@ public class AppInitializer implements ServletContextListener {
 
       Loader.init();
       Loader.loadPlugins();
-      Constants.context.info("Server started successfully!");
+      Constants.context.info("Server started successfully!!!");
     } catch (Exception e) {
       Constants.context.log(e);
     }

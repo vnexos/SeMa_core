@@ -33,6 +33,8 @@ import com.vnexos.sema.util.Mapper;
 import com.vnexos.sema.util.PrivateServiceConstructor;
 import com.vnexos.sema.util.StringUtils;
 import com.vnexos.sema.util.UUIDUtil;
+import com.vnexos.sema.util.format.FormatException;
+import com.vnexos.sema.util.format.Formatter;
 import com.vnexos.sema.util.logger.Logger;
 import com.vnexos.sema.util.logger.LoggerFormatDriver;
 
@@ -54,15 +56,24 @@ public class ContextHandler {
    * 
    * @param sql The sql command to log
    */
-  private static void log(String sql) {
+  private static void log(String sql, long ms) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(sql);
+
+    sb.append("$fg(15) (");
+    sb.append("$fg(12)");
+    sb.append(System.currentTimeMillis() - ms);
+    sb.append(" $fg(15)ms)");
+    Formatter formatter = new Formatter();
     try {
       StackTraceElement[] elements = Thread.currentThread().getStackTrace();
       LoggerFormatDriver.setClassPath(elements[2]);
       PrivateServiceConstructor.invokeFunction(
           Logger.class, "sql", Constants.context.getLogger(),
           PrivateServiceConstructor.createClassTypes(String.class),
-          PrivateServiceConstructor.createObjects(sql));
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
+          PrivateServiceConstructor.createObjects(formatter.format(sb.toString())));
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException
+        | FormatException e) {
       Constants.context.log("SQL: " + sql);
     }
   }
@@ -80,6 +91,7 @@ public class ContextHandler {
    */
   private static Object invokeCreateFunction(String tableName, Class<?> entityType, Class<?> idType,
       Object entityObject) throws SQLException, IllegalAccessException {
+    long time = System.currentTimeMillis();
     Field idField = ClassUtils.findAnnotatedField(entityType, Identity.class);
     Identity id = idField.getAnnotation(Identity.class);
 
@@ -104,7 +116,7 @@ public class ContextHandler {
     Statement stm = conn.createStatement();
     stm.executeUpdate(sql);
 
-    log(sql);
+    log(sql, time);
     conn.close();
 
     return entityObject;
@@ -123,6 +135,7 @@ public class ContextHandler {
    */
   private static Object invokeGetFunction(Method method, String tableName, Class<?> entityType, Object[] entityObjects)
       throws SQLException, ContextException {
+    long time = System.currentTimeMillis();
     DatabaseEngine engine = Database.getEngine();
     String methodName = method.getName().replace("get", "");
     String sql = buildSqlQuery(engine, method, tableName, methodName, entityObjects);
@@ -132,7 +145,7 @@ public class ContextHandler {
     ResultSet rs = stm.executeQuery(sql);
     JsonArray jsonArray = Mapper.serializeResultSet(rs);
 
-    log(sql);
+    log(sql, time);
     conn.close();
 
     return mapResultsToReturnType(method, entityType, jsonArray);
@@ -306,12 +319,12 @@ public class ContextHandler {
    */
   private static Object invokeCountFunction(Method method, String tableName, Class<?> entityType, Object[] entityObject)
       throws ContextException, SQLException {
+    long time = System.currentTimeMillis();
     DatabaseEngine engine = Database.getEngine();
 
     String condition = buildWhereCondition(engine, method, entityObject);
 
     String sql = engine.generateCount(tableName, condition.toString());
-    log(sql);
 
     if (sql == null)
       throw new ContextException("Invalid count function for `" + tableName + "`!");
@@ -319,6 +332,7 @@ public class ContextHandler {
     Connection conn = Database.getConnection();
     Statement stm = conn.createStatement();
     ResultSet rs = stm.executeQuery(sql);
+    log(sql, time);
 
     if (rs.next()) {
       return rs.getInt(1);
@@ -384,6 +398,7 @@ public class ContextHandler {
   private static <T, ID> Object invokeUpdateFunction(Object proxy, Method method, String tableName, Class<T> entityType,
       Class<ID> idType, Object[] objects)
       throws ContextException, SQLException, IllegalAccessException {
+    long time = System.currentTimeMillis();
     Parameter[] parameters = method.getParameters();
     DatabaseEngine engine = Database.getEngine();
 
@@ -476,7 +491,7 @@ public class ContextHandler {
     Statement stm = conn.createStatement();
 
     stm.executeUpdate(sql);
-    log(sql);
+    log(sql, time);
     conn.close();
 
     return entityObject;
@@ -499,6 +514,7 @@ public class ContextHandler {
   @SuppressWarnings("unchecked")
   private static <T, ID> Object invokeDeleteFunction(Object proxy, String tableName, Class<T> entityType,
       Class<ID> idType, Object object) throws ContextException, SQLException {
+    long time = System.currentTimeMillis();
     DatabaseEngine engine = Database.getEngine();
     String sql;
     Object entityObject;
@@ -554,7 +570,7 @@ public class ContextHandler {
     Statement stm = conn.createStatement();
 
     stm.executeUpdate(sql);
-    log(sql);
+    log(sql, time);
     conn.close();
 
     return entityObject;

@@ -9,7 +9,7 @@
   </parent>
   
   <groupId>com.vnexos.sema</groupId>
-  <artifactId>webapp</artifactId>
+  <artifactId>core</artifactId>
   <version>1.0</version>
   <packaging>war</packaging>
   
