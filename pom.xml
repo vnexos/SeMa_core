@@ -8,10 +8,37 @@
     <version>1.0</version>
   </parent>
   
+  <name>SeMa Core</name>
+  <url>https://github.com/vnexos/SeMa_core</url>
+
   <groupId>com.vnexos.sema</groupId>
   <artifactId>core</artifactId>
   <version>1.0</version>
   <packaging>war</packaging>
+
+  <developers>
+    <developer>
+      <id>vnexos-owner</id>
+      <name>Mohamed al'Ilnung</name>
+      <email>vnexos.official@gmail.com</email>
+      <organization>vnexos</organization>
+      <organizationUrl>https://github.com/vnexos</organizationUrl>
+    </developer>
+  </developers>
+  
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/vnexos/SeMa_core</url>
+    <connection>scm:git:https://github.com/vnexos/SeMa_core</connection>
+    <developerConnection>scm:git:ssh://git@github.com:vnexos/SeMa_core.git</developerConnection>
+  </scm>
   
   <properties>
     <sonar.organization>vnexos</sonar.organization>
