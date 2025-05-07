@@ -10,6 +10,7 @@
   
   <name>SeMa Core</name>
   <url>https://github.com/vnexos/SeMa_core</url>
+  <description>Core of the SeMa modules</description>
 
   <groupId>com.vnexos.sema</groupId>
   <artifactId>core</artifactId>
