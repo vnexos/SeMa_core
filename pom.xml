@@ -2,11 +2,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.vnexos.sema</groupId>
-    <artifactId>main</artifactId>
-    <version>1.0</version>
-  </parent>
   
   <name>SeMa Core</name>
   <url>https://github.com/vnexos/SeMa_core</url>
@@ -44,6 +39,9 @@
   <properties>
     <sonar.organization>vnexos</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <java.version>21</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
   <build>
     <finalName>ROOT</finalName>
@@ -53,8 +51,8 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>3.3.2</version>
         <configuration>
-            <attachClasses>true</attachClasses>  <!-- Generate a JAR with compiled classes -->
-            <classesClassifier>lib</classesClassifier>
+          <attachClasses>true</attachClasses>  <!-- Generate a JAR with compiled classes -->
+          <classesClassifier>lib</classesClassifier>
         </configuration>
       </plugin>
     </plugins>
