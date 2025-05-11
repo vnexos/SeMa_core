@@ -16,6 +16,7 @@
     <groupId>com.vnexos.sema</groupId>
     <artifactId>main</artifactId>
     <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <developers>
