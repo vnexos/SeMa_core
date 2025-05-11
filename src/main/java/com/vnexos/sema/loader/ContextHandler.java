@@ -164,7 +164,7 @@ public class ContextHandler {
    * @throws SQLException     if the SQL statement cannot be generated
    */
   private static String buildSqlQuery(DatabaseEngine engine, Method method, String tableName,
-      String methodName, Object[] entityObject) throws ContextException, SQLException {
+      String methodName, Object[] entityObject) throws SQLException, ContextException {
     if (isGetAllQuery(methodName, entityObject)) {
       return engine.generateGet(tableName, null, null);
     }
@@ -197,12 +197,14 @@ public class ContextHandler {
    * @return the list of column to get
    */
   private static String[] extractColumns(String methodName) {
-    if (methodName.isEmpty()) {
+    String[] extracted = methodName.split("By");
+    if (extracted[0].isEmpty()) {
       return new String[0];
     }
-    String[] columns = methodName.split("And");
+    String[] columns = extracted[0].split("And");
     for (int i = 0; i < columns.length; i++) {
       columns[i] = StringUtils.convertCamelToSnake(columns[i]);
+      System.out.println(columns[i]);
     }
     return columns;
   }
