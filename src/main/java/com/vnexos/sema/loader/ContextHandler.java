@@ -400,6 +400,7 @@ public class ContextHandler {
   private static <T, ID> Object invokeUpdateFunction(Object proxy, Method method, String tableName, Class<T> entityType,
       Class<ID> idType, Object[] objects)
       throws ContextException, SQLException, IllegalAccessException {
+    // TODO: Refacture for updating from map in param
     long time = System.currentTimeMillis();
     Parameter[] parameters = method.getParameters();
     DatabaseEngine engine = Database.getEngine();
@@ -411,7 +412,7 @@ public class ContextHandler {
       throw new ContextException("Invalid update function.");
     else if (parameters.length == 1) {
       Parameter entityParam = parameters[0];
-      if (entityParam.getType() != entityType)
+      if (entityParam.getType() != entityType || entityParam.getType() != Map.class)
         throw new ContextException("Invalid update function.");
 
       entityObject = objects[0];
@@ -421,16 +422,20 @@ public class ContextHandler {
         throw new ContextException("No @Identity field found in " + entityType.getSimpleName());
       }
 
-      idField.setAccessible(true);
       Object idValue;
-      try {
-        idValue = idField.get(entityObject);
-      } catch (IllegalAccessException e) {
-        throw new ContextException("Failed to access identity field", e);
-      }
+      if (entityParam.getType() == entityType) {
+        idField.setAccessible(true);
+        try {
+          idValue = idField.get(entityObject);
+        } catch (IllegalAccessException e) {
+          throw new ContextException("Failed to access identity field", e);
+        }
 
-      if (idValue == null) {
-        throw new ContextException("Cannot update: identity field value is null");
+        if (idValue == null) {
+          throw new ContextException("Cannot update: identity field value is null");
+        }
+      } else {
+        idValue = ((Map<?, ?>) entityObject).get(idField.getName());
       }
 
       StringBuilder where = new StringBuilder();

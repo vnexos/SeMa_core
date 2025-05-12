@@ -132,7 +132,8 @@ public class Logger {
    * @param type    the logger level
    */
   private void log(String message, LoggerType type) {
-    if (!isClosed && stringStream.stream().anyMatch(str -> str.contains(type.getValue()))) {
+    if (!isClosed &&
+        (type == LoggerType.NONE || stringStream.stream().anyMatch(str -> str.contains(type.getValue())))) {
       resetSystemLog();
       String msg = getMessage(message, type, 0);
       System.out.println(msg);
