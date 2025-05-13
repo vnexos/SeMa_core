@@ -254,10 +254,11 @@ public class Module {
         | InvocationTargetException | NoSuchMethodException | SecurityException e) {
       throw new ApiException("Controller must have only default constructor!", e);
     }
+    String path = controller.value().startsWith("/")
+        ? controller.value()
+        : Route.join(Constants.getString("module.api-prefix"), controller.value());
     for (Method method : clazz.getDeclaredMethods()) {
-      String path = controller.value().startsWith("/")
-          ? controller.value()
-          : Route.join(Constants.getString("module.api-prefix"), controller.value());
+      String routePath = "";
       List<Annotation> annotations = getRouteAnnotation(method);
       if (annotations.size() > 0)
         for (Annotation annotation : annotations) {
@@ -272,22 +273,32 @@ public class Module {
           HttpRoute httpRoute = (HttpRoute) getSuperAnnotation(annotation);
           switch (httpRoute.value()) {
             case GET:
-              path = Route.join(path, ((HttpGet) annotation).value());
+              routePath = ((HttpGet) annotation).value().startsWith("/")
+                  ? ((HttpGet) annotation).value()
+                  : Route.join(path, ((HttpGet) annotation).value());
               break;
             case POST:
-              path = Route.join(path, ((HttpPost) annotation).value());
+              routePath = ((HttpPost) annotation).value().startsWith("/")
+                  ? ((HttpPost) annotation).value()
+                  : Route.join(path, ((HttpPost) annotation).value());
               break;
             case PUT:
-              path = Route.join(path, ((HttpPut) annotation).value());
+              routePath = ((HttpPut) annotation).value().startsWith("/")
+                  ? ((HttpPut) annotation).value()
+                  : Route.join(path, ((HttpPut) annotation).value());
               break;
             case PATCH:
-              path = Route.join(path, ((HttpPatch) annotation).value());
+              routePath = ((HttpPatch) annotation).value().startsWith("/")
+                  ? ((HttpPatch) annotation).value()
+                  : Route.join(path, ((HttpPatch) annotation).value());
               break;
             case DELETE:
-              path = Route.join(path, ((HttpDelete) annotation).value());
+              routePath = ((HttpDelete) annotation).value().startsWith("/")
+                  ? ((HttpDelete) annotation).value()
+                  : Route.join(path, ((HttpDelete) annotation).value());
               break;
           }
-          ApiController.addApi(path, httpRoute.value(), method, instance);
+          ApiController.addApi(routePath, httpRoute.value(), method, instance);
         }
     }
   }

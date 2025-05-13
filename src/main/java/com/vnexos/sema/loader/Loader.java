@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 import com.vnexos.sema.Constants;
 import com.vnexos.sema.context.ServerContext;
@@ -170,6 +171,55 @@ public class Loader {
   }
 
   /**
+   * Get all files in library directory
+   * 
+   * @param libFoler directory to get files
+   * @return the list of all files in directory tree
+   */
+  private static List<File> getFileTree(File libFoler) {
+    List<File> files = new ArrayList<>();
+
+    for (File f : libFoler.listFiles()) {
+      if (f.isDirectory()) {
+        files.addAll(getFileTree(f));
+      } else {
+        files.add(f);
+      }
+    }
+
+    return files;
+  }
+
+  /**
+   * Get URLs of all modules and libraries
+   * 
+   * @param subFiles list of files in module folder
+   * @return the list of JAR file URL
+   */
+  private static URL[] getLibUrls(File[] subFiles) {
+    List<URL> urls = new ArrayList<>();
+    File file = new File(context.joinPath("libs"));
+
+    if (!file.exists())
+      file.mkdirs();
+
+    List<File> libFiles = getFileTree(file);
+    File[] filesToCatch = Stream.concat(libFiles.stream(), Arrays.stream(subFiles)).toArray(File[]::new);
+
+    for (File f : filesToCatch) {
+      if (f.getName().toLowerCase().endsWith(".jar")) {
+        try {
+          urls.add(f.toURI().toURL());
+        } catch (MalformedURLException e) {
+          context.log(e);
+        }
+      }
+    }
+
+    return urls.toArray(new URL[0]);
+  }
+
+  /**
    * Initializes the loader. This method will get a list of jar file inside
    * modules folder and analyze the jar file to get necessary data for controlling
    * and processing a module.
@@ -190,19 +240,12 @@ public class Loader {
     File[] subFiles = file.listFiles();
     // Get current loader
     URLClassLoader classLoader = new URLClassLoader(
-        Arrays.stream(subFiles).filter(f -> f.getName().endsWith(".jar")).map(f -> {
-          try {
-            return f.toURI().toURL();
-          } catch (MalformedURLException e) {
-            context.log(e);
-            return null;
-          }
-        }).filter(Objects::nonNull).toArray(URL[]::new),
+        getLibUrls(subFiles),
         Loader.class.getClassLoader());
     Thread.currentThread().setContextClassLoader(classLoader);
 
     for (File subFile : subFiles) {
-      if (subFile.getName().endsWith(".jar")) {
+      if (subFile.getName().toLowerCase().endsWith(".jar")) {
         // Get module information
         Module module = loadJar(subFile, classLoader);
 

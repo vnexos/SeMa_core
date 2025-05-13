@@ -53,7 +53,7 @@ public class Mapper {
       return (D) gson.toJson(source);
     }
 
-    String json = gson.toJson(source);
+    String json = source instanceof String ? (String) source : gson.toJson(source);
     return gson.fromJson(json, destination);
   }
 
