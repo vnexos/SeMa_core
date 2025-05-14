@@ -35,7 +35,7 @@ import com.vnexos.sema.loader.json.LocalDateAdapter;
 import com.vnexos.sema.loader.json.LocalDateTimeAdapter;
 import com.vnexos.sema.loader.json.LocalTimeAdapter;
 import com.vnexos.sema.util.ClassUtils;
-import com.vnexos.sema.util.LibraryLoader;
+import com.vnexos.sema.util.LibraryLoaderUtil;
 import com.vnexos.sema.util.PrivateServiceConstructor;
 import com.vnexos.sema.util.logger.Logger;
 import com.vnexos.sema.util.logger.LoggerFormatDriver;
@@ -172,7 +172,7 @@ public class Database {
    */
   @SuppressWarnings("unused")
   private static void init() throws SQLException {
-    URLClassLoader loader = LibraryLoader.getCommonLoader(new File[0]);
+    URLClassLoader loader = LibraryLoaderUtil.getCommonLoader(new File[0]);
     try {
       Class<?> clazz = loader.loadClass(Constants.getString("sql.driver"));
 

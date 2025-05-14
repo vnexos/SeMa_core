@@ -18,10 +18,10 @@ import com.vnexos.sema.loader.Loader;
  * 
  * @author Trần Việt Đăng Quang
  */
-public class LibraryLoader {
+public class LibraryLoaderUtil {
   private static ServerContext context = Constants.context;
 
-  private LibraryLoader() {
+  private LibraryLoaderUtil() {
   }
 
   /**

@@ -24,7 +24,7 @@ import com.vnexos.sema.loader.annotations.AutoWired;
 import com.vnexos.sema.loader.annotations.MainClass;
 import com.vnexos.sema.loader.interfaces.AModule;
 import com.vnexos.sema.util.ClassUtils;
-import com.vnexos.sema.util.LibraryLoader;
+import com.vnexos.sema.util.LibraryLoaderUtil;
 import com.vnexos.sema.util.PrivateServiceConstructor;
 
 /**
@@ -186,7 +186,7 @@ public class Loader {
     // Load all jar file as a module
     File[] subFiles = file.listFiles();
     // Get current loader
-    URLClassLoader classLoader = LibraryLoader.getCommonLoader(subFiles);
+    URLClassLoader classLoader = LibraryLoaderUtil.getCommonLoader(subFiles);
     Thread.currentThread().setContextClassLoader(classLoader);
 
     for (File subFile : subFiles) {

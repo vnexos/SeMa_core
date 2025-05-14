@@ -400,7 +400,6 @@ public class ContextHandler {
   private static <T, ID> Object invokeUpdateFunction(Object proxy, Method method, String tableName, Class<T> entityType,
       Class<ID> idType, Object[] objects)
       throws ContextException, SQLException, IllegalAccessException {
-    // TODO: Refacture for updating from map in param
     long time = System.currentTimeMillis();
     Parameter[] parameters = method.getParameters();
     DatabaseEngine engine = Database.getEngine();
