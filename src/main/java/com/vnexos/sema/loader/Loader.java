@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,7 +15,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.stream.Stream;
 
 import com.vnexos.sema.Constants;
 import com.vnexos.sema.context.ServerContext;
@@ -28,6 +24,7 @@ import com.vnexos.sema.loader.annotations.AutoWired;
 import com.vnexos.sema.loader.annotations.MainClass;
 import com.vnexos.sema.loader.interfaces.AModule;
 import com.vnexos.sema.util.ClassUtils;
+import com.vnexos.sema.util.LibraryLoader;
 import com.vnexos.sema.util.PrivateServiceConstructor;
 
 /**
@@ -170,55 +167,6 @@ public class Loader {
   }
 
   /**
-   * Get all files in library directory
-   * 
-   * @param libFoler directory to get files
-   * @return the list of all files in directory tree
-   */
-  private static List<File> getFileTree(File libFoler) {
-    List<File> files = new ArrayList<>();
-
-    for (File f : libFoler.listFiles()) {
-      if (f.isDirectory()) {
-        files.addAll(getFileTree(f));
-      } else {
-        files.add(f);
-      }
-    }
-
-    return files;
-  }
-
-  /**
-   * Get URLs of all modules and libraries
-   * 
-   * @param subFiles list of files in module folder
-   * @return the list of JAR file URL
-   */
-  private static URL[] getLibUrls(File[] subFiles) {
-    List<URL> urls = new ArrayList<>();
-    File file = new File(context.joinPath("libs"));
-
-    if (!file.exists())
-      file.mkdirs();
-
-    List<File> libFiles = getFileTree(file);
-    File[] filesToCatch = Stream.concat(libFiles.stream(), Arrays.stream(subFiles)).toArray(File[]::new);
-
-    for (File f : filesToCatch) {
-      if (f.getName().toLowerCase().endsWith(".jar")) {
-        try {
-          urls.add(f.toURI().toURL());
-        } catch (MalformedURLException e) {
-          context.log(e);
-        }
-      }
-    }
-
-    return urls.toArray(new URL[0]);
-  }
-
-  /**
    * Initializes the loader. This method will get a list of jar file inside
    * modules folder and analyze the jar file to get necessary data for controlling
    * and processing a module.
@@ -238,9 +186,7 @@ public class Loader {
     // Load all jar file as a module
     File[] subFiles = file.listFiles();
     // Get current loader
-    URLClassLoader classLoader = new URLClassLoader(
-        getLibUrls(subFiles),
-        Loader.class.getClassLoader());
+    URLClassLoader classLoader = LibraryLoader.getCommonLoader(subFiles);
     Thread.currentThread().setContextClassLoader(classLoader);
 
     for (File subFile : subFiles) {

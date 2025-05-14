@@ -24,6 +24,9 @@ import com.vnexos.sema.loader.json.LocalTimeAdapter;
  * 
  */
 public class Mapper {
+  private Mapper() {
+  }
+
   private static final Gson gson = new GsonBuilder()
       .setExclusionStrategies(new HiddenExclusionStrategy())
       .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())

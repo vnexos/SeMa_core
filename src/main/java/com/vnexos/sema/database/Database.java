@@ -1,8 +1,11 @@
 package com.vnexos.sema.database;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLClassLoader;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,6 +35,7 @@ import com.vnexos.sema.loader.json.LocalDateAdapter;
 import com.vnexos.sema.loader.json.LocalDateTimeAdapter;
 import com.vnexos.sema.loader.json.LocalTimeAdapter;
 import com.vnexos.sema.util.ClassUtils;
+import com.vnexos.sema.util.LibraryLoader;
 import com.vnexos.sema.util.PrivateServiceConstructor;
 import com.vnexos.sema.util.logger.Logger;
 import com.vnexos.sema.util.logger.LoggerFormatDriver;
@@ -168,9 +172,14 @@ public class Database {
    */
   @SuppressWarnings("unused")
   private static void init() throws SQLException {
+    URLClassLoader loader = LibraryLoader.getCommonLoader(new File[0]);
     try {
-      Class.forName(Constants.getString("sql.driver"));
-    } catch (ClassNotFoundException e) {
+      Class<?> clazz = loader.loadClass(Constants.getString("sql.driver"));
+
+      Driver driverInstance = (Driver) clazz.getDeclaredConstructor().newInstance();
+      DriverManager.registerDriver(new DriverWrapper(driverInstance));
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+        | InvocationTargetException | NoSuchMethodException | SecurityException e) {
       throw new SQLException("Cannot find Driver for database.", e);
     }
 
