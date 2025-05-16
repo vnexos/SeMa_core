@@ -106,4 +106,36 @@ public class ClassUtils {
 
     return null;
   }
+
+  /**
+   * Check if the class is Java class
+   * 
+   * @param clazz
+   * @return
+   */
+  public static boolean isJavaBuiltInClass(Class<?> clazz) {
+    if (clazz == null) {
+      return false;
+    }
+
+    if (clazz.isPrimitive())
+      return true;
+
+    // Get the package name
+    Package pkg = clazz.getPackage();
+    String packageName = pkg != null ? pkg.getName() : "";
+
+    // Check if the package starts with common JDK prefixes
+    return packageName.startsWith("java.") ||
+        packageName.startsWith("javax.") ||
+        packageName.startsWith("sun.") ||
+        packageName.startsWith("jdk.") ||
+        packageName.startsWith("com.sun.") ||
+        packageName.startsWith("org.w3c.") ||
+        packageName.startsWith("org.xml.");
+  }
+
+  public static boolean isCustomClass(Class<?> clazz) {
+    return clazz != null && !isJavaBuiltInClass(clazz);
+  }
 }

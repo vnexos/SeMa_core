@@ -2,17 +2,15 @@ package com.vnexos.sema.util.html;
 
 import java.util.Map;
 
-/**
- * Represents div element of HTML.
- * 
- * @author Trần Việt Đăng Quang
- */
-public class DivElement extends DOM {
-  /**
-   * Constructs a div element
-   */
-  public DivElement() {
-    super("div");
+public class ScriptElement extends DOM {
+
+  public ScriptElement(String src) {
+    this();
+    setProperty("src", src);
+  }
+
+  public ScriptElement() {
+    super("script");
   }
 
   @Override
@@ -39,4 +37,5 @@ public class DivElement extends DOM {
         .append('>');
     return html.toString();
   }
+
 }

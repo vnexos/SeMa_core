@@ -3,11 +3,13 @@ package com.vnexos.sema;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,8 +243,12 @@ public class ApiController extends HttpServlet {
     resp.setStatus(response.getStatusCode());
     if (response.getContentType().startsWith("text/html")) {
       resp.getWriter().write(response.getData().toString());
-    } else {
+    } else if (response.getContentType().startsWith("application/json")) {
       resp.getWriter().write(response.getJsonData());
+    } else {
+      OutputStream os = resp.getOutputStream();
+      os.write(response.getBinaryData());
+      resp.setContentLengthLong(response.getBinaryData().length);
     }
   }
 
@@ -260,6 +266,14 @@ public class ApiController extends HttpServlet {
     List<Part> filePart = new ArrayList<>();
     String body = parseRequestBody(req, filePart);
     HttpMethod httpMethod = HttpMethod.valueOf(method);
+
+    // Get all headers from request
+    Map<String, String> headers = new HashMap<>();
+    Enumeration<String> headerNames = req.getHeaderNames();
+    while (headerNames.hasMoreElements()) {
+      String headerName = headerNames.nextElement();
+      headers.put(headerName, req.getHeader(headerName));
+    }
 
     try {
       if (isOriginFailed) {
@@ -280,7 +294,8 @@ public class ApiController extends HttpServlet {
                     throw new UncheckedIOException(e);
                   }
                 })
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()),
+            headers);
         writeResponse(resp, response);
       } else {
         resp.setStatus(404);

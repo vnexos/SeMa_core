@@ -28,6 +28,24 @@ public class DOM {
   }
 
   /**
+   * Get props of tag
+   * 
+   * @return tag properties
+   */
+  protected Map<String, String> getProps() {
+    return props;
+  }
+
+  /**
+   * Get children
+   * 
+   * @return children of tag
+   */
+  protected List<DOM> getChildren() {
+    return children;
+  }
+
+  /**
    * Sets parrent for a node of HTML.
    * 
    * @param parent the parent node to set

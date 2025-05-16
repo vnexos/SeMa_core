@@ -1,5 +1,6 @@
 package com.vnexos.sema.loader;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -20,6 +21,7 @@ import com.vnexos.sema.Constants;
 import com.vnexos.sema.loader.annotations.FromBody;
 import com.vnexos.sema.loader.annotations.FromQuery;
 import com.vnexos.sema.loader.annotations.FromRoute;
+import com.vnexos.sema.loader.interfaces.ControllerBase;
 import com.vnexos.sema.util.ClassUtils;
 import com.vnexos.sema.util.Mapper;
 
@@ -140,7 +142,8 @@ public class Route {
    * @return the response returned from the route method after invoke
    * @throws ApiException if an error occurs while processing a route
    */
-  public ApiResponse<?> invoke(Map<String, String> param, Map<String, String> query, String body, List<Part> parts)
+  public ApiResponse<?> invoke(Map<String, String> param, Map<String, String> query, String body, List<Part> parts,
+      Map<String, String> headers)
       throws ApiException {
     final Method method = this.method;
     List<Object> paramValues = new ArrayList<>();
@@ -182,8 +185,15 @@ public class Route {
     // Invoke method and get ApiResponse
     Object res;
     try {
+      Class<?> controllerBase = instance.getClass().getSuperclass();
+      if (controllerBase == ControllerBase.class) {
+        Field field = controllerBase.getDeclaredField("headers");
+        field.setAccessible(true);
+        field.set(instance, headers);
+      }
+
       res = method.invoke(instance, paramValues.toArray());
-    } catch (IllegalAccessException | InvocationTargetException e) {
+    } catch (IllegalAccessException | InvocationTargetException | NoSuchFieldException | SecurityException e) {
       throw new ApiException("Cannot invoke route method", e);
     }
     return (ApiResponse<?>) res;
@@ -206,7 +216,9 @@ public class Route {
    * @return the URL path after joined
    */
   public static String join(String base, String... params) {
-    Path path = Paths.get(base, params);
-    return path.toString().replace("\\", "/");
+    Path path = Paths.get(base.equals("/") ? "" : base, params);
+    if (path.toString().length() == 0)
+      return "/";
+    return (base.equals("/") ? "/" : "") + path.toString().replace("\\", "/");
   }
 }

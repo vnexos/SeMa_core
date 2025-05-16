@@ -262,7 +262,6 @@ public class Module {
       List<Annotation> annotations = getRouteAnnotation(method);
       if (annotations.size() > 0)
         for (Annotation annotation : annotations) {
-
           try {
             if (!Loader.handleAutoWiredFields(clazz, instance))
               Loader.queuedInstance.add(instance);

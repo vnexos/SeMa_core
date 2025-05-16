@@ -1,5 +1,7 @@
 package com.vnexos.sema.loader.interfaces;
 
+import java.util.Map;
+
 import com.vnexos.sema.ApiResponse;
 
 /**
@@ -12,19 +14,29 @@ import com.vnexos.sema.ApiResponse;
  * @see ApiResponse
  */
 public class ControllerBase {
-  public <T> ApiResponse<T> createOk(T obj) {
+  private Map<String, String> headers;
+
+  protected String getHeader(String name) {
+    return headers.get(name);
+  }
+
+  protected Map<String, String> getHeaders() {
+    return headers;
+  }
+
+  protected <T> ApiResponse<T> createOk(T obj) {
     return new ApiResponse<T>(obj, 200);
   }
 
-  public <T> ApiResponse<T> createBadRequest(T obj) {
+  protected <T> ApiResponse<T> createBadRequest(T obj) {
     return new ApiResponse<T>(obj, 400);
   }
 
-  public <T> ApiResponse<T> createInternalRequest(T obj) {
+  protected <T> ApiResponse<T> createInternalRequest(T obj) {
     return new ApiResponse<T>(obj, 500);
   }
 
-  public <T> ApiResponse<T> custom(T obj, int statusCode) {
+  protected <T> ApiResponse<T> custom(T obj, int statusCode) {
     return new ApiResponse<T>(obj, 200);
   }
 }

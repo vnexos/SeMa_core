@@ -1,5 +1,7 @@
 package com.vnexos.sema;
 
+import com.vnexos.sema.util.Mapper;
+
 /**
  * Represents a response from a route of controller.
  * 
@@ -58,6 +60,15 @@ public class ApiResponse<T> {
    */
   public String getJsonData() {
     return Constants.gson.toJson(data);
+  }
+
+  /**
+   * Gets byte array value of data
+   * 
+   * @return the byte array from data.
+   */
+  public byte[] getBinaryData() {
+    return Mapper.map(data, byte[].class);
   }
 
   /**

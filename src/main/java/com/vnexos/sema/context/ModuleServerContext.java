@@ -4,6 +4,8 @@
  */
 package com.vnexos.sema.context;
 
+import java.nio.file.Path;
+
 import com.vnexos.sema.loader.Module;
 import com.vnexos.sema.util.logger.LoggerFormatDriver;
 
@@ -106,5 +108,20 @@ public class ModuleServerContext extends ServerContext {
     setStackTrace();
     LoggerFormatDriver.setModule(module.getModuleName());
     getLogger().error(str);
+  }
+
+  /**
+   * Get a specific folder of the module
+   * 
+   * @return the path of module folder
+   */
+  public String getModuleFolder() {
+    String safeFile = module.getModuleName().replaceAll("[\\\\/:*?\"<>|]", "_");
+    return super.joinPath("modules", safeFile);
+  }
+
+  @Override
+  public String joinPath(String... path) {
+    return Path.of(getModuleFolder(), path).toString();
   }
 }

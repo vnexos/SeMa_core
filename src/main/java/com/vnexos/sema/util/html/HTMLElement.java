@@ -12,4 +12,9 @@ public class HTMLElement extends DOM {
   public HTMLElement() {
     super("html");
   }
+
+  @Override
+  public String toString() {
+    return super.toString();
+  }
 }
